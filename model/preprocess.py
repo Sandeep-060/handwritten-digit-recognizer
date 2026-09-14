@@ -72,3 +72,53 @@ def preprocess_image(image):
     canvas = np.expand_dims(canvas, axis=0)
 
     return canvas
+
+def analyze_drawing(image):
+    """
+    Analyze the drawing before model prediction.
+
+    Returns information about the foreground structure
+    of the user's drawing.
+    """
+
+    # Convert image to a NumPy array
+    image = np.asarray(image)
+
+    # Remove alpha channel if RGBA
+    if image.ndim == 3 and image.shape[-1] == 4:
+        image = image[..., :3]
+
+    # Convert RGB image to grayscale
+    if image.ndim == 3:
+        image = np.mean(image, axis=-1)
+
+    image = image.astype("float32")
+
+    # Normalize pixel values to 0–1
+    if image.max() > 1.0:
+        image = image / 255.0
+
+    # Make sure the drawing is white on black
+    if image.mean() > 0.5:
+        image = 1.0 - image
+
+    # Identify foreground pixels
+    threshold = 0.1
+    mask = image > threshold
+
+    # Empty canvas
+    if not np.any(mask):
+        return {
+            "empty": True,
+            "component_count": 0,
+        }
+
+    # Count connected components
+    from .validation import count_components
+
+    component_count = count_components(mask)
+
+    return {
+        "empty": False,
+        "component_count": component_count,
+    }
