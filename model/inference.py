@@ -15,7 +15,7 @@ def predict_digit(model, processed_image, component_count=1):
     Predict a digit from an already-preprocessed image.
 
     Expected input shape:
-        (1, 28, 28)
+        (1, 28, 28, 1)
 
     Returns:
         Dictionary containing prediction and validation information.
