@@ -70,6 +70,8 @@ def preprocess_image(image):
 
     # Add batch dimension
     canvas = np.expand_dims(canvas, axis=0)
+    # Add grayscale channel dimension for CNN
+    canvas = np.expand_dims(canvas, axis=-1)
 
     return canvas
 
