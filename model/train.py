@@ -6,11 +6,14 @@ from data import load_and_prepare_data
 
 def build_model():
     model = keras.Sequential([
-        layers.Input(shape=(28, 28)),
+        layers.Input(shape=(28, 28, 1)),
+        layers.Conv2D(32,kernel_size=(3, 3),activation="relu",),
+        layers.MaxPooling2D(pool_size=(2, 2),),
+        layers.Conv2D(64,kernel_size=(3, 3),activation="relu",),
+        layers.MaxPooling2D(pool_size=(2, 2),),
         layers.Flatten(),
-        layers.Dense(128, activation="relu"),
-        layers.Dense(64, activation="relu"),
-        layers.Dense(10, activation="softmax"),
+        layers.Dense(64,activation="relu",),
+        layers.Dense(10,activation="softmax",),
     ])
     return model
 
@@ -19,7 +22,11 @@ def main():
     # Load and prepare MNIST
     x_train, y_train, x_test, y_test = load_and_prepare_data()
 
-    # Build the neural network
+    # Add the grayscale channel dimension for CNN
+    x_train = x_train[..., None]
+    x_test = x_test[..., None]
+
+    # Build the CNN
     model = build_model()
 
     # Configure the training process
@@ -29,7 +36,10 @@ def main():
         metrics=["accuracy"],
     )
 
-    # Train the model
+    # Show the CNN architecture
+    model.summary()
+
+    # Train the CNN
     model.fit(
         x_train,
         y_train,
@@ -48,9 +58,13 @@ def main():
     print(f"\nTest loss: {test_loss:.4f}")
     print(f"Test accuracy: {test_accuracy:.4f}")
 
-    # Save the trained model
+    # Save the trained CNN
     model_path = Path("model") / "saved" / "digit_model.keras"
-    model_path.parent.mkdir(parents=True, exist_ok=True)
+    model_path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
     model.save(model_path)
 
     print(f"\nModel saved to: {model_path}")
