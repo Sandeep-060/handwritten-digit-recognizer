@@ -1,6 +1,5 @@
 import numpy as np
 from tensorflow import keras
-
 def load_and_prepare_data():
     # Load the MNIST dataset
     (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
